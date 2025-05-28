@@ -1,6 +1,6 @@
 import mongoose, {model, Schema} from "mongoose";
-
-mongoose.connect("connectionstring")
+//@ts-ignore
+//mongoose.connect(process.env.DB_CONNECTION)
 //user, link, content, tags
 const UserSchema = new Schema({
     username: {type: String, unique: true},
@@ -23,7 +23,7 @@ const LinkSchema = new Schema({
 const TagSchema = new Schema({
     content: String,
 })
-export const UserModel = model("User", UserSchema);
+export const UserModel = model("user", UserSchema);
 export const LinkModel = model("Links", LinkSchema);
 export const ContentModel = model("Content", ContentSchema);
 export const TagModel = model("Tags", TagSchema)

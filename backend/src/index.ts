@@ -4,7 +4,11 @@ import jwt from "jsonwebtoken"
 import cors from "cors"
 import { UserModel, ContentModel, LinkModel, TagModel } from "./db"
 import bcrypt from "bcrypt"
-mongoose.connect("connection_string")
+import dotenv from "dotenv"
+
+dotenv.config()
+//@ts-ignore
+mongoose.connect(process.env.DB_CONNECTION)
 import { JwtPassword } from "./config"
 
 
@@ -13,6 +17,7 @@ const app = express()
 
 app.use(express.json())
 app.use(cors())
+
 
 app.post("/api/v1/signup", async (req, res)=>{
     const username = req.body.username
@@ -33,12 +38,32 @@ app.post("/api/v1/signup", async (req, res)=>{
         res.status(411).json({
             message: "User Already Exists"
         })
+        console.log(error)
     }
 })
 
 
-app.post("/api/v1/signin", (req, res)=>{
-    
+app.post("/api/v1/signin", async (req, res)=>{
+    const username = req.body.username;
+    const password = req.body.password;
+
+    const existingUser = await UserModel.findOne({
+        username,
+        password
+    })
+    if (existingUser) {
+        const token = jwt.sign({
+            id: existingUser._id
+        }, JwtPassword)
+
+        res.json({
+            token
+        })
+    } else {
+        res.status(403).json({
+            message: "Incorrrect credentials"
+        })
+    }
 })
 
 
@@ -60,4 +85,8 @@ app.post("/api/v1/brain/share", (req, res)=>{
 
 app.get("/api/v1/brain/:shareLink", (req, res)=>{
     
+})
+
+app.listen(3002, ()=>{
+    console.log('DB started')
 })
