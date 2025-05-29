@@ -6,7 +6,7 @@ import cors from "cors"
 import { UserModel, ContentModel, LinkModel, TagModel } from "./db"
 import bcrypt from "bcrypt"
 import dotenv from "dotenv"
-
+import { userMiddleware } from "./middleware";
 dotenv.config()
 //@ts-ignore
 mongoose.connect(process.env.DB_CONNECTION)
@@ -51,14 +51,14 @@ app.post("/api/v1/signin", async (req, res)=>{
     })
     if(!existinguser) {
         res.status(403).json({
-            message: "Incorrrect credentials"
+            message: "Incorrrect username"
         })
     }
     //@ts-ignore
     const isPasswordCorrect = bcrypt.compare(password, existinguser.password)
     if(!isPasswordCorrect) {
         res.status(403).json({
-            message: "Incorrrect credentials"
+            message: "Incorrrect password"
         })
     }
     if(existinguser) {
@@ -77,12 +77,31 @@ app.post("/api/v1/signin", async (req, res)=>{
 })
 
 
-app.get("/api/v1/content", (req, res)=>{
-
+app.get("/api/v1/content", userMiddleware, async (req, res)=>{
+    // @ts-ignore
+    const userId = req.userId;
+    const content = await ContentModel.find({
+        userId: userId
+    }).populate("userId", "username")
+    res.json({
+        content
+    })
 })
 
-app.post("/api/v1/content", (req, res)=>{
-
+app.post("/api/v1/content", userMiddleware, async (req, res)=>{
+    const link = req.body.link
+    const type = req.body.type
+    const title = req.body.title
+    await ContentModel.create({
+        link: link,
+        title: title,
+        tags: [],
+        userId: req.userId,
+        type: type,
+    })
+    res.json({
+        message: "Content added for the user"
+    })
 })
 
 app.delete("/api/v1/content", (req, res)=>{

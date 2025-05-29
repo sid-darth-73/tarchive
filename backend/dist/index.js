@@ -19,6 +19,7 @@ const cors_1 = __importDefault(require("cors"));
 const db_1 = require("./db");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const middleware_1 = require("./middleware");
 dotenv_1.default.config();
 //@ts-ignore
 mongoose_1.default.connect(process.env.DB_CONNECTION);
@@ -55,14 +56,14 @@ app.post("/api/v1/signin", (req, res) => __awaiter(void 0, void 0, void 0, funct
     });
     if (!existinguser) {
         res.status(403).json({
-            message: "Incorrrect credentials"
+            message: "Incorrrect username"
         });
     }
     //@ts-ignore
     const isPasswordCorrect = bcrypt_1.default.compare(password, existinguser.password);
     if (!isPasswordCorrect) {
         res.status(403).json({
-            message: "Incorrrect credentials"
+            message: "Incorrrect password"
         });
     }
     if (existinguser) {
@@ -79,10 +80,31 @@ app.post("/api/v1/signin", (req, res) => __awaiter(void 0, void 0, void 0, funct
         });
     }
 }));
-app.get("/api/v1/content", (req, res) => {
-});
-app.post("/api/v1/content", (req, res) => {
-});
+app.get("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // @ts-ignore
+    const userId = req.userId;
+    const content = yield db_1.ContentModel.find({
+        userId: userId
+    }).populate("userId", "username");
+    res.json({
+        content
+    });
+}));
+app.post("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const link = req.body.link;
+    const type = req.body.type;
+    const title = req.body.title;
+    yield db_1.ContentModel.create({
+        link: link,
+        title: title,
+        tags: [],
+        userId: req.userId,
+        type: type,
+    });
+    res.json({
+        message: "Content added for the user"
+    });
+}));
 app.delete("/api/v1/content", (req, res) => {
 });
 app.post("/api/v1/brain/share", (req, res) => {

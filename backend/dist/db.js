@@ -47,16 +47,16 @@ const ContentSchema = new mongoose_1.Schema({
     link: String,
     tags: [{ type: mongoose_1.default.Types.ObjectId, ref: 'Tag' }],
     type: String,
-    userId: { type: mongoose_1.default.Types.ObjectId, ref: 'User', required: true },
+    userId: { type: mongoose_1.default.Types.ObjectId, ref: 'user', required: true },
 });
 const LinkSchema = new mongoose_1.Schema({
     hash: String,
-    userId: { type: mongoose_1.default.Types.ObjectId, ref: 'User', required: true, unique: true },
+    userId: { type: mongoose_1.default.Types.ObjectId, ref: 'user', required: true, unique: true },
 });
 const TagSchema = new mongoose_1.Schema({
     content: String,
 });
 exports.UserModel = (0, mongoose_1.model)("user", UserSchema);
-exports.LinkModel = (0, mongoose_1.model)("Links", LinkSchema);
-exports.ContentModel = (0, mongoose_1.model)("Content", ContentSchema);
-exports.TagModel = (0, mongoose_1.model)("Tags", TagSchema);
+exports.LinkModel = (0, mongoose_1.model)("links", LinkSchema);
+exports.ContentModel = (0, mongoose_1.model)("content", ContentSchema);
+exports.TagModel = (0, mongoose_1.model)("tags", TagSchema);
