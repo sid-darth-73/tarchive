@@ -50,13 +50,24 @@ app.post("/api/v1/signup", (req, res) => __awaiter(void 0, void 0, void 0, funct
 app.post("/api/v1/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const username = req.body.username;
     const password = req.body.password;
-    const existingUser = yield db_1.UserModel.findOne({
-        username,
-        password
+    const existinguser = yield db_1.UserModel.findOne({
+        username
     });
-    if (existingUser) {
+    if (!existinguser) {
+        res.status(403).json({
+            message: "Incorrrect credentials"
+        });
+    }
+    //@ts-ignore
+    const isPasswordCorrect = bcrypt_1.default.compare(password, existinguser.password);
+    if (!isPasswordCorrect) {
+        res.status(403).json({
+            message: "Incorrrect credentials"
+        });
+    }
+    if (existinguser) {
         const token = jsonwebtoken_1.default.sign({
-            id: existingUser._id
+            id: existinguser._id
         }, config_1.JwtPassword);
         res.json({
             token

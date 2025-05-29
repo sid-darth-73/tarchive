@@ -1,6 +1,7 @@
 import express from "express"
 import mongoose from "mongoose"
 import jwt from "jsonwebtoken"
+import { Request, Response } from "express"; 
 import cors from "cors"
 import { UserModel, ContentModel, LinkModel, TagModel } from "./db"
 import bcrypt from "bcrypt"
@@ -42,18 +43,27 @@ app.post("/api/v1/signup", async (req, res)=>{
     }
 })
 
-
 app.post("/api/v1/signin", async (req, res)=>{
     const username = req.body.username;
     const password = req.body.password;
-
-    const existingUser = await UserModel.findOne({
-        username,
-        password
+    const existinguser = await UserModel.findOne({
+        username
     })
-    if (existingUser) {
+    if(!existinguser) {
+        res.status(403).json({
+            message: "Incorrrect credentials"
+        })
+    }
+    //@ts-ignore
+    const isPasswordCorrect = bcrypt.compare(password, existinguser.password)
+    if(!isPasswordCorrect) {
+        res.status(403).json({
+            message: "Incorrrect credentials"
+        })
+    }
+    if(existinguser) {
         const token = jwt.sign({
-            id: existingUser._id
+            id: existinguser._id
         }, JwtPassword)
 
         res.json({
