@@ -24,6 +24,7 @@ dotenv_1.default.config();
 //@ts-ignore
 mongoose_1.default.connect(process.env.DB_CONNECTION);
 const config_1 = require("./config");
+const utils_1 = require("./utils");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
@@ -107,8 +108,25 @@ app.post("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter
 }));
 app.delete("/api/v1/content", (req, res) => {
 });
-app.post("/api/v1/brain/share", (req, res) => {
-});
+app.post("/api/v1/brain/share", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const canShare = req.body.share;
+    if (!canShare) {
+        yield db_1.LinkModel.deleteOne({
+            userId: req.userId
+        });
+        res.status(200).json({
+            message: "Link deleted"
+        });
+        return;
+    }
+    yield db_1.LinkModel.create({
+        userId: req.userId,
+        hash: (0, utils_1.random)(7)
+    });
+    res.status(200).json({
+        message: "Link Created"
+    });
+}));
 app.get("/api/v1/brain/:shareLink", (req, res) => {
 });
 app.listen(3002, () => {

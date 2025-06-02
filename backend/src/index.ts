@@ -11,6 +11,7 @@ dotenv.config()
 //@ts-ignore
 mongoose.connect(process.env.DB_CONNECTION)
 import { JwtPassword } from "./config"
+import { random } from "./utils";
 
 
 
@@ -104,16 +105,62 @@ app.post("/api/v1/content", userMiddleware, async (req, res)=>{
     })
 })
 
-app.delete("/api/v1/content", (req, res)=>{
+app.delete("/api/v1/content", userMiddleware, async (req, res)=>{
+    const contentId = req.body.contentId
+    const userIdforUserWhoNeedsDeletion = req.userId
+    await ContentModel.deleteMany({
+        contentId,
+        userId: userIdforUserWhoNeedsDeletion
+    })
 
+    res.json({
+        message: "Deleted"
+    })
 })
 
-app.post("/api/v1/brain/share", (req, res)=>{
-
+app.post("/api/v1/brain/share", userMiddleware, async (req, res)=>{
+    const canShare = req.body.share
+    if(!canShare) {
+        await LinkModel.deleteOne({
+            userId: req.userId
+        })
+        res.status(200).json({
+            message: "Link deleted"
+        })
+        return;
+    }
+    await LinkModel.create({
+        userId: req.userId,
+        hash: random(7)
+    })
+    res.status(200).json({
+        message: "Link Created"
+    })
 })
 
-app.get("/api/v1/brain/:shareLink", (req, res)=>{
-    
+app.get("/api/v1/brain/:shareLink", async (req, res)=>{
+    const givenHash = req.params.shareLink;
+    const link = await LinkModel.findOne({
+        hash: givenHash
+    })
+    if(link) {
+        const content = await ContentModel.find({
+            userId: link.userId
+        })
+        const user = await UserModel.findOne({
+            userId: link.userId
+        })
+
+        res.json({
+            username: user?.username,
+            content: content
+        })
+    }else {
+        //givenHash does not lead to a valid link
+        res.status(402).json({
+            message: "Invalid url"
+        })
+    }
 })
 
 app.listen(3002, ()=>{
