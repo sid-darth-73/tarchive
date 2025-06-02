@@ -1,10 +1,24 @@
-import { useState } from 'react'
-
+import { Button } from './components/ui/Button'
+import PlusIcon from './icons/PlusIcon'
+import ShareIcon from './icons/ShareIcon'
 function App() {
-  const [count, setCount] = useState(0)
   return (
     <>
-    <button onClick={()=> setCount(count+1)} className="bg-amber-700">Click {count}</button>
+      <Button
+      variant="primary"
+      text="share"
+      size="md"
+      onClick={() => console.log("Clicked")}
+      startIcon={PlusIcon}
+    />
+    <Button
+      variant="secondary"
+      text="share"
+      size="md"
+      onClick={() => console.log("Clicked")}
+      startIcon={ShareIcon}
+    />
+
     </>
   )
 }
