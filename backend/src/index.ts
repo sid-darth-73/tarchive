@@ -129,12 +129,23 @@ app.post("/api/v1/brain/share", userMiddleware, async (req, res)=>{
         })
         return;
     }
+    const existingUserLink = await LinkModel.findOne({
+        userId: req.userId
+    })
+    if(existingUserLink) {
+        res.json({
+            message: "user already exists",
+            hash: existingUserLink.hash
+        })
+        return;
+    }
+    const hash = random(8)
     await LinkModel.create({
         userId: req.userId,
-        hash: random(7)
+        hash: hash
     })
     res.status(200).json({
-        message: "Link Created"
+        message: "Link Created: /share/" + hash
     })
 })
 
@@ -148,7 +159,8 @@ app.get("/api/v1/brain/:shareLink", async (req, res)=>{
             userId: link.userId
         })
         const user = await UserModel.findOne({
-            userId: link.userId
+            userId: link.userId,
+            //_id: link.userId  (test it later)
         })
 
         res.json({

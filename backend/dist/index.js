@@ -106,8 +106,17 @@ app.post("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter
         message: "Content added for the user"
     });
 }));
-app.delete("/api/v1/content", (req, res) => {
-});
+app.delete("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const contentId = req.body.contentId;
+    const userIdforUserWhoNeedsDeletion = req.userId;
+    yield db_1.ContentModel.deleteMany({
+        contentId,
+        userId: userIdforUserWhoNeedsDeletion
+    });
+    res.json({
+        message: "Deleted"
+    });
+}));
 app.post("/api/v1/brain/share", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const canShare = req.body.share;
     if (!canShare) {
@@ -119,16 +128,49 @@ app.post("/api/v1/brain/share", middleware_1.userMiddleware, (req, res) => __awa
         });
         return;
     }
+    const existingUserLink = yield db_1.LinkModel.findOne({
+        userId: req.userId
+    });
+    if (existingUserLink) {
+        res.json({
+            message: "user already exists",
+            hash: existingUserLink.hash
+        });
+        return;
+    }
+    const hash = (0, utils_1.random)(8);
     yield db_1.LinkModel.create({
         userId: req.userId,
-        hash: (0, utils_1.random)(7)
+        hash: hash
     });
     res.status(200).json({
-        message: "Link Created"
+        message: "Link Created: /share/" + hash
     });
 }));
-app.get("/api/v1/brain/:shareLink", (req, res) => {
-});
+app.get("/api/v1/brain/:shareLink", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const givenHash = req.params.shareLink;
+    const link = yield db_1.LinkModel.findOne({
+        hash: givenHash
+    });
+    if (link) {
+        const content = yield db_1.ContentModel.find({
+            userId: link.userId
+        });
+        const user = yield db_1.UserModel.findOne({
+            userId: link.userId
+        });
+        res.json({
+            username: user === null || user === void 0 ? void 0 : user.username,
+            content: content
+        });
+    }
+    else {
+        //givenHash does not lead to a valid link
+        res.status(402).json({
+            message: "Invalid url"
+        });
+    }
+}));
 app.listen(3002, () => {
     console.log('DB started');
 });
