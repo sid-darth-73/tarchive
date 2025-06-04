@@ -1,3 +1,5 @@
+import type { ReactElement } from "react"
+
 export interface ButtonProps {
     variant: "primary" | "secondary"
     size: "md" | "sm" | "lg"
@@ -14,9 +16,11 @@ const sizeStyles = {
 }
 
 const variantStyles = {
-    "primary": "bg-[#5046e4] text-white",
-    "secondary": "bg-[#e0e7fe] text-[#5046e4]",
+    "primary": "bg-[#7164c0] text-white",
+    "secondary": "bg-[#d9ddee] text-[#9492db]",
 }
+
+const fontStyle = "font-thin"
 
 export function Button(props: ButtonProps) {
     const StartIcon = props.startIcon;
@@ -24,7 +28,7 @@ export function Button(props: ButtonProps) {
     return (
         <button
             onClick={props.onClick}
-            className={sizeStyles[props.size] + " " + variantStyles[props.variant]}
+            className={sizeStyles[props.size] + " " + variantStyles[props.variant] + " " + fontStyle}
         >
             <div className="flex items-center">
                 {StartIcon && (
