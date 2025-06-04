@@ -6,7 +6,7 @@ export interface ButtonProps {
     startIcon?: any
     endIcon?: any
     text: string
-    onClick: () => void
+    onClick?: () => void
 }
 
 const sizeStyles = {
@@ -20,7 +20,7 @@ const variantStyles = {
     "secondary": "bg-[#d9ddee] text-[#9492db]",
 }
 
-const fontStyle = "font-thin"
+const defaultStyle = "font-thin cursor-pointer"
 
 export function Button(props: ButtonProps) {
     const StartIcon = props.startIcon;
@@ -28,7 +28,7 @@ export function Button(props: ButtonProps) {
     return (
         <button
             onClick={props.onClick}
-            className={sizeStyles[props.size] + " " + variantStyles[props.variant] + " " + fontStyle}
+            className={sizeStyles[props.size] + " " + variantStyles[props.variant] + " " + defaultStyle}
         >
             <div className="flex items-center">
                 {StartIcon && (
