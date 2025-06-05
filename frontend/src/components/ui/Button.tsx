@@ -1,5 +1,3 @@
-import type { ReactElement } from "react"
-
 export interface ButtonProps {
     variant: "primary" | "secondary"
     size: "md" | "sm" | "lg"
@@ -7,6 +5,8 @@ export interface ButtonProps {
     endIcon?: any
     text: string
     onClick?: () => void
+    fullWidth?: boolean
+    loading?: boolean
 }
 
 const sizeStyles = {
@@ -28,7 +28,7 @@ export function Button(props: ButtonProps) {
     return (
         <button
             onClick={props.onClick}
-            className={sizeStyles[props.size] + " " + variantStyles[props.variant] + " " + defaultStyle}
+            className={sizeStyles[props.size] + " " + variantStyles[props.variant] + " " + defaultStyle + `${props.fullWidth ? " w-full flex justify-center items-center" : ""} ${props.loading ? "opacity-45	" : ""}`} disabled={props.loading}
         >
             <div className="flex items-center">
                 {StartIcon && (

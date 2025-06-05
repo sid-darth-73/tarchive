@@ -157,7 +157,8 @@ app.get("/api/v1/brain/:shareLink", (req, res) => __awaiter(void 0, void 0, void
             userId: link.userId
         });
         const user = yield db_1.UserModel.findOne({
-            userId: link.userId
+            userId: link.userId,
+            //_id: link.userId  (test it later)
         });
         res.json({
             username: user === null || user === void 0 ? void 0 : user.username,
