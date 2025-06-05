@@ -15,7 +15,7 @@ const ContentType={
     Twitter: "twitter"
 }
 
-export function CreateContentModal({open, onClose}: CreateContentModelProps) {
+export function CreateContentModel({open, onClose}: CreateContentModelProps) {
     const titleRef = useRef<HTMLInputElement>(null);
     const linkRef = useRef<HTMLInputElement>(null);
     const [type, setType] = useState(ContentType.Youtube);
@@ -30,7 +30,7 @@ export function CreateContentModal({open, onClose}: CreateContentModelProps) {
             type
         }, {
             headers: {
-                "Authorization": localStorage.getItem("token")
+                "authorization": localStorage.getItem("token")
             }
         })
 

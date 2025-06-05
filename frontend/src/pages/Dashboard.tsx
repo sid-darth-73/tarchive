@@ -5,9 +5,11 @@ import PlusIcon from '../icons/PlusIcon'
 import ShareIcon from '../icons/ShareIcon'
 import { useState } from 'react'
 import { Sidebar } from '../components/ui/Sidebar'
+import { useContent } from '../hooks/useContent'
 
 export function Dashboard() {
   const [modelOpen, setModelOpen] = useState(false)
+  const {contents, refresh} = useContent();
   return (
     <div>
       <Sidebar/>
@@ -32,8 +34,11 @@ export function Dashboard() {
         />
         </div>
         <div className="flex gap-4">
-        <Card title="Youtube" link="https://www.youtube.com/watch?v=8vnHJNjwuqg" type="youtube"/>
-        <Card title="Tweet" link="https://x.com/RCBTweets/status/1929966487797891122" type="twitter"/>
+        {contents.map(({type, link, title}) => <Card 
+            type={type}
+            link={link}
+            title={title}
+        />)}
         </div>
         </div>
     </div>
